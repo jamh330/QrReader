@@ -1,6 +1,8 @@
 import { AfterViewInit, Component } from '@angular/core';
 import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
 import { AlertController, Platform } from '@ionic/angular';
+import { InAppBrowser } from '@awesome-cordova-plugins/in-app-browser/ngx';
+import { StorageService } from 'src/app/service/storage.service';
 
 @Component({
   selector: 'app-tab1',
@@ -11,7 +13,7 @@ export class Tab1Page implements AfterViewInit{
 
   scanActivo:boolean=false;
   
-  constructor(private platform:Platform, private alertCrtl:AlertController) {}
+  constructor(private platform:Platform, private alertCrtl:AlertController,private iab: InAppBrowser, private storageService:StorageService) {}
   isCapacitor:boolean=this.platform.is('capacitor');
 
   ngAfterViewInit() {
@@ -28,9 +30,28 @@ export class Tab1Page implements AfterViewInit{
         this.scanActivo=true;
         const result = await BarcodeScanner.startScan();
         if(result.hasContent){
-          console.log(result);
+
+          console.log(result.content.indexOf('http'));
+          
+          
+          this.storageService.saveHistory(result);
+
+
+          if(result.content.indexOf('http') != -1){
+            const browser = this.iab.create(result.content);
+            browser.show();
+            console.log('oli soy una web');
+            console.log(result);
+          }else if(result.content.indexOf('geo') != -1){
+            console.log(result);
+            console.log('oli soy una geo');
+          }else{
+            console.log('oli no soy nada');
+          }
+
+
           this.scanActivo=false;
-          console.log('oli')
+          
         }
         
       }
