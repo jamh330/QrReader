@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { StorageService } from 'src/app/service/storage.service';
+import { InAppBrowser } from '@awesome-cordova-plugins/in-app-browser/ngx';
 
 
 @Component({
@@ -13,6 +14,22 @@ export class Tab2Page {
     return this.storageService.LocalHistory;
   }
 
-  constructor(private storageService:StorageService) {}
+
+  constructor(private storageService:StorageService,private iab: InAppBrowser) {}
+
+  openLink(url:string){
+
+    if(url.indexOf('http') != -1){
+    const browser = this.iab.create(url);
+    browser.show();
+    }
+
+  }
+
+  deleteHistory(url:string){
+
+    this.storageService.removeHistory(url);
+
+  }
 
 }

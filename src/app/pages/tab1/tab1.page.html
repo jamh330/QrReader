@@ -1,10 +1,24 @@
+<ion-item *ngIf="scanActivo"> 
+    <ion-button ion-button outline item-start (click)="closeScan()" shape="round">
+        <ion-icon name="close-circle"></ion-icon>Ya no quiero escanear
+    </ion-button>
+</ion-item>
+
 <ion-content [style.--background]="scanActivo?'#00000000':'#fff'">
 
+    
+
 <ion-slide>
-   
     <ion-button (click)="scan()" expand="full" fill="outline" shape="round">
-        Escanear Codigo
+        {{textScan}}
     </ion-button>
 </ion-slide>
 
+
 </ion-content>
+
+<ion-item *ngIf="scanActivo"> 
+<ion-button ion-button outline item-start (click)="scan()" shape="round">
+    <ion-icon name="refresh-circle"></ion-icon> No escanea? Recargar
+</ion-button>
+</ion-item>

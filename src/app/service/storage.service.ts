@@ -25,8 +25,12 @@ export class StorageService {
   }
 
   async saveHistory(history:any){
-    this._history = [history,...this._history];
-    this._storage.set('history',this._history);
+    const exists = this._history.find(localHistory=>localHistory.content === history.content);
+    if(!exists){
+      this._history = [history,...this._history];
+      this._storage.set('history',this._history);
+    }
+    
   }
 
   async loadHistory(){
@@ -36,6 +40,11 @@ export class StorageService {
     } catch (error) {
       
     }
+  }
+
+  async removeHistory(url:string){
+    this._history = this._history.filter(localHistory => localHistory.content != url);
+    this._storage.set('history',this._history);
   }
 
 

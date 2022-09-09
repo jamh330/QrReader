@@ -12,6 +12,7 @@ import { StorageService } from 'src/app/service/storage.service';
 export class Tab1Page implements AfterViewInit{
 
   scanActivo:boolean=false;
+  textScan:string= 'Comenzar a Escanear Codigo';
   
   constructor(private platform:Platform, private alertCrtl:AlertController,private iab: InAppBrowser, private storageService:StorageService) {}
   isCapacitor:boolean=this.platform.is('capacitor');
@@ -28,6 +29,7 @@ export class Tab1Page implements AfterViewInit{
       const permitido= this.checkPermisos();
       if(permitido){
         this.scanActivo=true;
+        this.textScan= 'Escanee un codigo';
         const result = await BarcodeScanner.startScan();
         if(result.hasContent){
 
@@ -46,11 +48,13 @@ export class Tab1Page implements AfterViewInit{
             console.log(result);
             console.log('oli soy una geo');
           }else{
-            console.log('oli no soy nada');
+            console.log('oli no se que soy');
           }
 
 
           this.scanActivo=false;
+          this.textScan= 'Comenzar a Escanear Codigo';
+          BarcodeScanner.stopScan();
           
         }
         
@@ -94,11 +98,11 @@ export class Tab1Page implements AfterViewInit{
 
     });
 
-    
+  }
 
-
-
-
+  closeScan(){
+    this.scanActivo=false;
+    BarcodeScanner.stopScan();
   }
 
 }
