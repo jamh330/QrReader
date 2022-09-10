@@ -36,11 +36,33 @@ export class Tab2Page {
 
   async openMenu(url:string, name:string){
 
+    const isType = this.generaIcon(url);
+    let  textOpen = 'Abrir';
+
+    if(isType=='globe'){
+      textOpen='Abrir Enlace'
+    }
+    else if(isType=='call'){
+      textOpen='Llamar'
+    }
+    else if(isType=='wifi'){
+      textOpen='Abrir wifi'
+    }
+    else if(isType=='mail'){
+      textOpen='Enviar Correo'
+    }
+    else if(isType=='videocam'){
+      textOpen='Abrir en Zoom'
+    }
+    else if(isType=='logo-whatsapp'){
+      textOpen='Abrir en Whatsapp'
+    }
+
     const actionSheet = await this.actionSheetCtr.create({
       header : 'Opciones',
       buttons: [
         {
-          text: 'Abrir',
+          text: textOpen,
           icon: 'open-outline',
           handler : ()=>this.openLink(url)
         },
