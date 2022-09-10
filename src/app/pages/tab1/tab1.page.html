@@ -9,16 +9,18 @@
     
 
 <ion-slide>
-    <ion-button (click)="scan()" expand="full" fill="outline" shape="round">
+    <ion-button *ngIf="!scanActivo" (click)="scan()" expand="full" fill="outline" shape="round">
         {{textScan}}
     </ion-button>
 </ion-slide>
 
+<div *ngIf="scanActivo" class="scan-box"></div>
+
 
 </ion-content>
 
-<ion-item *ngIf="scanActivo"> 
+<!-- <ion-item *ngIf="scanActivo"> 
 <ion-button ion-button outline item-start (click)="scan()" shape="round">
     <ion-icon name="refresh-circle"></ion-icon> No escanea? Recargar
 </ion-button>
-</ion-item>
+</ion-item> -->

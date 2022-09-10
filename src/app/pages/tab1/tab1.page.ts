@@ -13,6 +13,7 @@ export class Tab1Page implements AfterViewInit{
 
   scanActivo:boolean=false;
   textScan:string= 'Comenzar a Escanear Codigo';
+  result:any[]=[];
   
   constructor(private platform:Platform, private alertCrtl:AlertController,private iab: InAppBrowser, private storageService:StorageService) {}
   isCapacitor:boolean=this.platform.is('capacitor');
@@ -33,20 +34,18 @@ export class Tab1Page implements AfterViewInit{
         const result = await BarcodeScanner.startScan();
         if(result.hasContent){
 
-          console.log(result.content.indexOf('http'));
-          
-          
-          this.storageService.saveHistory(result);
+          this.result.push({'date': new Date(),'content':result.content,'format':result.format})
+     
+    
+          await this.storageService.saveHistory(this.result[0]);
 
+          
 
           if(result.content.indexOf('http') != -1){
             const browser = this.iab.create(result.content);
             browser.show();
-            console.log('oli soy una web');
-            console.log(result);
           }else if(result.content.indexOf('geo') != -1){
-            console.log(result);
-            console.log('oli soy una geo');
+
           }else{
             console.log('oli no se que soy');
           }
@@ -55,6 +54,7 @@ export class Tab1Page implements AfterViewInit{
           this.scanActivo=false;
           this.textScan= 'Comenzar a Escanear Codigo';
           BarcodeScanner.stopScan();
+          this.result=[];
           
         }
         
@@ -62,6 +62,7 @@ export class Tab1Page implements AfterViewInit{
       
     }else{
       console.log('Escaner solo disponible como aplicación en celular')
+      this.textScan= 'Escaner solo disponible como aplicación en celular';
       this.scanActivo=false;
     }
   }
@@ -102,7 +103,9 @@ export class Tab1Page implements AfterViewInit{
 
   closeScan(){
     this.scanActivo=false;
+    this.textScan= 'Comenzar a Escanear Codigo';
     BarcodeScanner.stopScan();
   }
+ 
 
 }

@@ -38,7 +38,7 @@ export class StorageService {
       const history = await this._storage.get('history');
       this._history = history || [];
     } catch (error) {
-      
+      console.log(error)
     }
   }
 
