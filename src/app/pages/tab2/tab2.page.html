@@ -15,21 +15,26 @@
 
  <ion-list>
 
+  <ion-button fill="clear" (click)="borrarHistorial()">
+    Vaciar Historial
+  </ion-button>
 
   <ion-item *ngFor="let historial of history" >
 
-    <ion-button fill="clear">
+    <ion-button fill="clear" (click)="openLink(historial.content)">
       <ion-icon slot="icon-only" [name]="generaIcon(historial.content)"></ion-icon>
     </ion-button>
 
     <ion-label>
-      <h2 (click)="openLink(historial.content)">{{historial.content}}</h2>
-      <p>{{historial.date | date: 'dd/mm/yyyy'}}</p>
+      <h2 *ngIf="historial.name" (click)="openLink(historial.content)">{{historial.name}}</h2>
+      <h2 *ngIf="!historial.name" (click)="openLink(historial.content)">{{historial.content}}</h2>
+      <p *ngIf="historial.name" (click)="openLink(historial.content)">{{historial.content}}</p>
+      <p>{{historial.date | date: 'dd/MM/yyyy HH:mm'}}</p>
     </ion-label>
   
 
 
-    <ion-button (click)="openMenu(historial.content)" fill="clear">
+    <ion-button (click)="openMenu(historial.content,historial.name)" fill="clear">
       <ion-icon slot="icon-only" name="ellipsis-vertical-outline"></ion-icon>
     </ion-button>
  

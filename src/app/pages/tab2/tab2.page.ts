@@ -3,6 +3,9 @@ import { StorageService } from 'src/app/service/storage.service';
 import { InAppBrowser } from '@awesome-cordova-plugins/in-app-browser/ngx';
 import { ActionSheetController } from '@ionic/angular';
 import { Share } from '@capacitor/share';
+import { CallNumber } from '@awesome-cordova-plugins/call-number/ngx';
+import { OpenNativeSettings } from '@awesome-cordova-plugins/open-native-settings/ngx';
+import { AlertController } from '@ionic/angular';
 
 
 
@@ -18,13 +21,20 @@ export class Tab2Page {
   }
 
 
-  constructor(private storageService:StorageService,private iab: InAppBrowser, private actionSheetCtr:ActionSheetController) {}
+  constructor(
+    private storageService:StorageService,
+    private iab: InAppBrowser, 
+    private actionSheetCtr:ActionSheetController,
+    private callNumber: CallNumber,
+    private openNativeSettings: OpenNativeSettings,
+    private alertCrtl:AlertController
+    ) {}
+
+  nameQr:string;
 
   
 
-  
-
-  async openMenu(url:string){
+  async openMenu(url:string, name:string){
 
     const actionSheet = await this.actionSheetCtr.create({
       header : 'Opciones',
@@ -33,6 +43,11 @@ export class Tab2Page {
           text: 'Abrir',
           icon: 'open-outline',
           handler : ()=>this.openLink(url)
+        },
+        {
+          text: 'Renombrar',
+          icon: 'create-outline',
+          handler : ()=>this.renameQr(url,name)
         },
         {
           text: 'Compartir',
@@ -58,10 +73,40 @@ export class Tab2Page {
 
   openLink(url:string){
 
-    if(url.indexOf('http') != -1){
+    const type = this.generaIcon(url)
+
+    if(type=='globe'){
     const browser = this.iab.create(url);
     browser.show();
     }
+
+    if(type=='call'){
+      let phone = url.replace('tel:','');
+      this.callNumber.callNumber(phone, true)
+        .then(res => console.log('Launched dialer!', res))
+        .catch(err => console.log('Error launching dialer', err));
+    }
+
+    if(type=='wifi'){
+      //to do WifiWizard2 
+      this.openNativeSettings.open("wifi")
+    }
+
+    if(type=='mail'){
+      //to do WifiWizard2 
+      window.open(url, "_system");
+    }
+
+    if(type=='videocam'){
+      //to do WifiWizard2 
+      window.open(url, "_system");
+    }
+
+    if(type=='logo-whatsapp'){
+      window.open(url, "_system");
+    }
+
+
 
   }
 
@@ -133,6 +178,60 @@ export class Tab2Page {
     }
     
     return 'help-circle';
+  }
+
+  async renameQr(url:string, name:string){
+
+
+    let alert = await this.alertCrtl.create({
+      header: 'Renombrar',
+      inputs: [
+        {
+          name: 'nameQr',
+          placeholder: 'escriba un nombre',
+          value: name ? name : ''
+        }
+      ],
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel',
+        },
+        {
+          text: 'Cambiar',
+          handler: data => {
+            this.storageService.renameQr(url,data.nameQr);
+          }
+        },
+      ]
+    });
+    alert.present();
+
+    
+  }
+
+ async borrarHistorial(){
+
+
+    let alert = await this.alertCrtl.create({
+      header: '¿Vaciar todo el historial?',
+      buttons: [
+        {
+          text: 'No',
+          role: 'cancel',
+        },
+        {
+          text: 'Si',
+          handler: () => {
+            this.storageService.borrarHistorial();
+          }
+        },
+      ]
+    });
+    alert.present();
+
+
+    
   }
 
 

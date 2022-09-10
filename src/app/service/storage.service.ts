@@ -48,4 +48,26 @@ export class StorageService {
   }
 
 
+  async renameQr(url:string, name:string){
+
+    const newArr = this._history.map(obj => {
+      if (obj.content === url) {
+        return {...obj, name: name};
+      }
+    
+      return obj;
+    });
+
+    console.log(newArr)
+
+    this._storage.set('history',newArr);
+    this._history = newArr;
+
+}
+
+async borrarHistorial(){
+  await this._storage.clear();
+  this._history = [];
+}
+
 }
