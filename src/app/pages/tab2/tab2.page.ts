@@ -6,6 +6,7 @@ import { Share } from '@capacitor/share';
 import { CallNumber } from '@awesome-cordova-plugins/call-number/ngx';
 import { OpenNativeSettings } from '@awesome-cordova-plugins/open-native-settings/ngx';
 import { AlertController } from '@ionic/angular';
+import { Registro } from 'src/app/Models/registro.model';
 
 
 
@@ -16,10 +17,14 @@ import { AlertController } from '@ionic/angular';
 })
 export class Tab2Page {
 
-  get history():any[]{
+  get history():Registro[]{
     return this.storageService.LocalHistory;
   }
 
+  public createdCode:string='';
+  public elementType : 'url' | 'canvas' | 'img' = 'url';
+
+  
 
   constructor(
     private storageService:StorageService,
@@ -27,34 +32,31 @@ export class Tab2Page {
     private actionSheetCtr:ActionSheetController,
     private callNumber: CallNumber,
     private openNativeSettings: OpenNativeSettings,
-    private alertCrtl:AlertController
+    private alertCrtl:AlertController,
+    
     ) {}
 
-  nameQr:string;
 
-  
+  async openMenu(registro:Registro){
 
-  async openMenu(url:string, name:string){
-
-    const isType = this.generaIcon(url);
     let  textOpen = 'Abrir';
 
-    if(isType=='globe'){
+    if(registro.type=='url'){
       textOpen='Abrir Enlace'
     }
-    else if(isType=='call'){
+    else if(registro.type=='tel'){
       textOpen='Llamar'
     }
-    else if(isType=='wifi'){
+    else if(registro.type=='wifi'){
       textOpen='Abrir wifi'
     }
-    else if(isType=='mail'){
+    else if(registro.type=='mail'){
       textOpen='Enviar Correo'
     }
-    else if(isType=='videocam'){
+    else if(registro.type=='zoom'){
       textOpen='Abrir en Zoom'
     }
-    else if(isType=='logo-whatsapp'){
+    else if(registro.type=='whatsapp'){
       textOpen='Abrir en Whatsapp'
     }
 
@@ -64,22 +66,27 @@ export class Tab2Page {
         {
           text: textOpen,
           icon: 'open-outline',
-          handler : ()=>this.openLink(url)
+          handler : ()=>this.openLink(registro)
         },
         {
           text: 'Renombrar',
           icon: 'create-outline',
-          handler : ()=>this.renameQr(url,name)
+          handler : ()=>this.renameQr(registro)
+        },
+        {
+          text: 'Ver como QR',
+          icon: 'create-outline',
+          handler : ()=>this.createQr(registro.content)
         },
         {
           text: 'Compartir',
           icon: 'share-outline',
-          handler : ()=>this.shareQr(url)
+          handler : ()=>this.shareQr(registro.content)
         },
         {
           text: 'Eliminar',
           icon: 'remove-circle',
-          handler : ()=>this.deleteHistory(url)
+          handler : ()=>this.deleteHistory(registro.content)
         },
         {
           text:'Cerrar',
@@ -93,42 +100,9 @@ export class Tab2Page {
     
   }
 
-  openLink(url:string){
+  openLink(registro:Registro){
 
-    const type = this.generaIcon(url)
-
-    if(type=='globe'){
-    const browser = this.iab.create(url);
-    browser.show();
-    }
-
-    if(type=='call'){
-      let phone = url.replace('tel:','');
-      this.callNumber.callNumber(phone, true)
-        .then(res => console.log('Launched dialer!', res))
-        .catch(err => console.log('Error launching dialer', err));
-    }
-
-    if(type=='wifi'){
-      //to do WifiWizard2 
-      this.openNativeSettings.open("wifi")
-    }
-
-    if(type=='mail'){
-      //to do WifiWizard2 
-      window.open(url, "_system");
-    }
-
-    if(type=='videocam'){
-      //to do WifiWizard2 
-      window.open(url, "_system");
-    }
-
-    if(type=='logo-whatsapp'){
-      window.open(url, "_system");
-    }
-
-
+    this.storageService.abrirRegistro(registro);
 
   }
 
@@ -147,63 +121,9 @@ export class Tab2Page {
 
   }
 
-  generaIcon(url:string){
 
-    var urlRegex = /(https?:\/\/[^\s]+)/g;
 
-    if(url.indexOf('https://zoom.') != -1){
-      return 'videocam';
-    }
-
-    if(url.indexOf('https://wa.me') != -1){
-      return 'logo-whatsapp';
-    } 
-    
-    if(url.match(urlRegex)){
-      return 'globe';
-    }
-    
-    if(url.indexOf('geo') != -1){
-      return 'pin';
-    } 
-
-    if(url.indexOf('tel:') != -1){
-      return 'call';
-    } 
-
-    if(url.indexOf('mailto:') != -1){
-      return 'mail';
-    } 
-
-    if(url.indexOf('SMSTO:') != -1){
-      return 'send';
-    } 
-
-    if(url.indexOf('skype:') != -1){
-      return 'logo-skype';
-    }
-
-    if(url.indexOf('WIFI:') != -1){
-      return 'wifi';
-    }
-
-    if(url.indexOf('BEGIN:VCARD') != -1){
-      return 'people';
-    }
-
-    if(url.indexOf('BEGIN:VCALENDAR') != -1){
-      return 'calendar';
-    }
-
-    if(url.indexOf('bitcoin:') != -1){
-      return 'logo-bitcoin';
-    }
-    
-    return 'help-circle';
-  }
-
-  async renameQr(url:string, name:string){
-
+  async renameQr(registro:Registro){
 
     let alert = await this.alertCrtl.create({
       header: 'Renombrar',
@@ -211,7 +131,7 @@ export class Tab2Page {
         {
           name: 'nameQr',
           placeholder: 'escriba un nombre',
-          value: name ? name : ''
+          value: registro.name ? registro.name : ''
         }
       ],
       buttons: [
@@ -222,7 +142,7 @@ export class Tab2Page {
         {
           text: 'Cambiar',
           handler: data => {
-            this.storageService.renameQr(url,data.nameQr);
+            this.storageService.renameQr(registro,data.nameQr);
           }
         },
       ]
@@ -253,6 +173,13 @@ export class Tab2Page {
     alert.present();
 
 
+    
+  }
+
+  createQr(url:string){
+
+    this.createdCode = url;
+    console.log(this.createdCode);
     
   }
 

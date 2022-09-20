@@ -10,10 +10,11 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { CallNumber } from '@awesome-cordova-plugins/call-number/ngx';
 import { OpenNativeSettings } from '@awesome-cordova-plugins/open-native-settings/ngx';
+import { NgxQRCodeModule } from '@techiediaries/ngx-qrcode';
 
 @NgModule({
   declarations: [AppComponent],
-  imports: [BrowserModule, IonicModule.forRoot(), AppRoutingModule, IonicStorageModule.forRoot()],
+  imports: [BrowserModule, IonicModule.forRoot(), AppRoutingModule, IonicStorageModule.forRoot(),NgxQRCodeModule],
   providers: [
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     InAppBrowser,
