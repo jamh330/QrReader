@@ -1,6 +1,6 @@
 import { AfterViewInit, Component } from '@angular/core';
 import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
-import { AlertController, Platform } from '@ionic/angular';
+import { AlertController, NavController, Platform } from '@ionic/angular';
 import { StorageService } from 'src/app/service/storage.service';
 import { Registro } from 'src/app/Models/registro.model';
 
@@ -17,14 +17,19 @@ export class Tab1Page implements AfterViewInit{
   constructor(
     private platform:Platform, 
     private alertCrtl:AlertController,
-    private storageService:StorageService
+    private storageService:StorageService,
+    private navCtrl:NavController,
     ) {}
 
   isCapacitor:boolean=this.platform.is('capacitor');
 
   ngAfterViewInit() {
+    
     if(this.isCapacitor){
     BarcodeScanner.prepare();
+    }else{
+      this.textScan   = 'Escaner solo disponible como aplicación en celular';
+      this.scanActivo = false;
     }
   }
 
@@ -41,10 +46,15 @@ export class Tab1Page implements AfterViewInit{
           const registro:Registro = new Registro(result.content,result.format);
 
           await this.storageService.saveHistory(registro);
-          this.storageService.abrirRegistro(registro);
+
+          if(registro.type == 'url' || registro.type == 'geo'){
+            this.storageService.abrirRegistro(registro);
+          }else{
+            this.navCtrl.navigateForward(`/tabs/tab2`);
+          }
 
           this.scanActivo   = false;
-          this.textScan     = 'Comenzar a Escanear Codigo';
+          this.textScan     = 'Toca para comenzar a Escanear';
           BarcodeScanner.stopScan();
           
         }
@@ -93,7 +103,7 @@ export class Tab1Page implements AfterViewInit{
 
   closeScan(){
     this.scanActivo   = false;
-    this.textScan     = 'Comenzar a Escanear Codigo';
+    this.textScan     = 'Toca para comenzar a Escanear';
     BarcodeScanner.stopScan();
   }
  

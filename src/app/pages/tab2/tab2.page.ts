@@ -1,10 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { StorageService } from 'src/app/service/storage.service';
-import { InAppBrowser } from '@awesome-cordova-plugins/in-app-browser/ngx';
 import { ActionSheetController } from '@ionic/angular';
 import { Share } from '@capacitor/share';
-import { CallNumber } from '@awesome-cordova-plugins/call-number/ngx';
-import { OpenNativeSettings } from '@awesome-cordova-plugins/open-native-settings/ngx';
 import { AlertController } from '@ionic/angular';
 import { Registro } from 'src/app/Models/registro.model';
 
@@ -28,14 +25,12 @@ export class Tab2Page {
 
   constructor(
     private storageService:StorageService,
-    private iab: InAppBrowser, 
     private actionSheetCtr:ActionSheetController,
-    private callNumber: CallNumber,
-    private openNativeSettings: OpenNativeSettings,
     private alertCrtl:AlertController,
     
     ) {}
 
+   
 
   async openMenu(registro:Registro){
 
@@ -43,6 +38,9 @@ export class Tab2Page {
 
     if(registro.type=='url'){
       textOpen='Abrir Enlace'
+    }
+    else if(registro.type=='geo'){
+      textOpen='Abrir Mapa'
     }
     else if(registro.type=='tel'){
       textOpen='Llamar'

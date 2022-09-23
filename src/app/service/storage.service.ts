@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { CallNumber } from '@awesome-cordova-plugins/call-number/ngx';
 import { InAppBrowser } from '@awesome-cordova-plugins/in-app-browser/ngx';
 import { OpenNativeSettings } from '@awesome-cordova-plugins/open-native-settings/ngx';
+import { NavController } from '@ionic/angular';
 import { Storage } from '@ionic/storage-angular';
 import { Registro } from '../Models/registro.model';
 
@@ -20,6 +21,7 @@ export class StorageService {
     private storage: Storage,
     private iab: InAppBrowser, 
     private callNumber: CallNumber,
+    private navCtrl:NavController,
     private openNativeSettings: OpenNativeSettings) { 
     this.init();
   }
@@ -56,12 +58,12 @@ export class StorageService {
     }
     
     else if(registro.type == 'geo'){
-      console.log('soy geo')
+      this.navCtrl.navigateForward(`/tabs/tab2/map/${registro.content}`);
     } 
 
     else if(registro.type == 'tel'){
       let phone = registro.content.replace('tel:','');
-      this.callNumber.callNumber(phone, true)
+      this.callNumber.callNumber(phone, false)
         .then(res => console.log('Launched dialer!', res))
         .catch(err => console.log('Error launching dialer', err));
     } 
@@ -71,11 +73,11 @@ export class StorageService {
     } 
 
     else if(registro.type == 'sms'){
-      console.log('soy un sms')
+      this.navCtrl.navigateForward(`/tabs/tab2`);
     } 
 
     else if(registro.type == 'skype'){
-      console.log('soy un skype')
+      this.navCtrl.navigateForward(`/tabs/tab2`);
     }
 
     else if(registro.type == 'wifi'){
@@ -83,19 +85,19 @@ export class StorageService {
     }
 
     else if(registro.type == 'vcard'){
-      console.log('soy un vcard')
+      this.navCtrl.navigateForward(`/tabs/tab2`);
     }
 
     else if(registro.type == 'calendar'){
-      console.log('soy un calendar')
+      this.navCtrl.navigateForward(`/tabs/tab2`);
     }
 
     else if(registro.type == 'bitcoin'){
-      console.log('soy un bitcoin')
+      this.navCtrl.navigateForward(`/tabs/tab2`);
     }
 
     else{
-      console.log('No soy nada')
+      this.navCtrl.navigateForward(`/tabs/tab2`);
     }
   }
 
